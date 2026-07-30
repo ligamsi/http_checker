@@ -17,6 +17,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+hosts = args.hosts.split(",")
 
-print(args.hosts)
-print(args.count)
+for host in hosts:
+    print(host)
