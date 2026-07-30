@@ -3,6 +3,7 @@ import requests
 import time
 import re
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 
 parser = argparse.ArgumentParser()
 
@@ -34,12 +35,14 @@ parser.add_argument(
 )
 
 output_file = None
+output_lock = Lock()
 
 def output(text):
-    if output_file:
-        print(text, file=output_file)
-    else:
-        print(text)
+    with output_lock:
+        if output_file:
+            print(text, file=output_file)
+        else:
+            print(text)
 
 def check_host(host, count):
     output(f"\nПроверяем {host}")
@@ -92,7 +95,7 @@ if args.hosts:
     hosts = args.hosts.split(",")
 else:
     try:
-        with open(args.file, "r") as file:
+        with open(args.file, "r", encoding="utf-8") as file:
             hosts = []
             for line in file:
                 host = line.strip()
@@ -106,7 +109,7 @@ for host in hosts:
     if not re.fullmatch(r"https://[A-Za-z0-9.-]+\.[A-Za-z]{2,}", host):
         parser.error(f"Некорректный адрес: {host}")
 
-with ThreadPoolExecutor() as executor:
+with ThreadPoolExecutor(max_workers=len(hosts)) as executor:
     futures = []
 
     for host in hosts:
@@ -115,3 +118,6 @@ with ThreadPoolExecutor() as executor:
 
     for future in futures:
         future.result()
+
+if output_file:
+    output_file.close()
