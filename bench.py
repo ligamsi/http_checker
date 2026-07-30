@@ -2,6 +2,7 @@ import argparse
 import requests
 import time
 import re
+from concurrent.futures import ThreadPoolExecutor
 
 parser = argparse.ArgumentParser()
 
@@ -105,5 +106,12 @@ for host in hosts:
     if not re.fullmatch(r"https://[A-Za-z0-9.-]+\.[A-Za-z]{2,}", host):
         parser.error(f"Некорректный адрес: {host}")
 
-for host in hosts:
-    check_host(host, args.count)
+with ThreadPoolExecutor() as executor:
+    futures = []
+
+    for host in hosts:
+        future = executor.submit(check_host, host, args.count)
+        futures.append(future)
+
+    for future in futures:
+        future.result()
