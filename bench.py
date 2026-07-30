@@ -21,5 +21,10 @@ args = parser.parse_args()
 hosts = args.hosts.split(",")
 
 for host in hosts:
-    response = requests.get(host)
-    print(f"{host} -> {response.status_code}")
+    print(f"\nПроверяем {host}")
+
+    for i in range(args.count):
+        print(f"Запрос №{i + 1}")
+
+        response = requests.get(host)
+        print(response.status_code)
