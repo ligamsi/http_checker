@@ -1,13 +1,21 @@
 import argparse
 import requests
 import time
+import re
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument(
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument(
     "-H",
     "--hosts",
     help="Список хостов"
+)
+
+group.add_argument(
+    "-F",
+    "--file",
+    help="Путь к файлу со списком хостов"
 )
 
 parser.add_argument(
@@ -17,9 +25,6 @@ parser.add_argument(
     default=1,
     help="Количество запросов"
 )
-
-args = parser.parse_args()
-hosts = args.hosts.split(",")
 
 def check_host(host, count):
     print(f"\nПроверяем {host}")
@@ -56,3 +61,20 @@ def check_host(host, count):
         print(f"Min: {min(times):.3f} сек")
         print(f"Max: {max(times):.3f} сек")
         print(f"Avg: {sum(times) / len(times):.3f} сек")
+
+args = parser.parse_args()
+if args.count <= 0:
+    parser.error("Количество запросов должно быть больше нуля")
+if args.hosts:
+    hosts = args.hosts.split(",")
+
+else:
+    with open(args.file, "r") as file:
+        hosts = []
+
+        for line in file:
+            hosts.append(line.strip())
+
+for host in hosts:
+    if not re.fullmatch(r"https://[A-Za-z0-9.-]+\.[A-Za-z]{2,}", host):
+        parser.error(f"Некорректный адрес: {host}")
