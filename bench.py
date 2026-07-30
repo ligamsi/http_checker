@@ -1,4 +1,5 @@
 import argparse
+import requests
 
 parser = argparse.ArgumentParser()
 
@@ -20,4 +21,5 @@ args = parser.parse_args()
 hosts = args.hosts.split(",")
 
 for host in hosts:
-    print(host)
+    response = requests.get(host)
+    print(f"{host} -> {response.status_code}")
