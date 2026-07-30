@@ -19,6 +19,17 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+def check_host(host, count):
+    print(f"\nПроверяем {host}")
+
+    times = []
+    success = 0
+    failed = 0
+    errors = 0
+
+    for i in range(count):
+        print(f"Запрос №{i + 1}")
+
 hosts = args.hosts.split(",")
 
 for host in hosts:
@@ -31,9 +42,8 @@ for host in hosts:
     for i in range(args.count):
         try:
             start = time.perf_counter()
-            response = requests.get(host)
-            finish = time.perf_counter()
-            elapsed = finish - start
+            response = requests.get(host, timeout=5)
+            elapsed = time.perf_counter() - start
             times.append(elapsed)
 
             if response.status_code == 200:
@@ -42,9 +52,10 @@ for host in hosts:
                 failed += 1
 
             print(f"Запрос {i + 1}: {response.status_code} ({elapsed:.3f} сек)")
-        except requests.RequestException:
+        except requests.RequestException as e:
             errors += 1
-            print(f"Запрос {i + 1}: Ошибка подключения")
+            print(f"Запрос {i + 1}: {e}")
+
     print(f"\nСтатистика для {host}")
     print(f"Success: {success}")
     print(f"Failed: {failed}")
