@@ -1,0 +1,22 @@
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "-H",
+    "--hosts",
+    help="Список хостов"
+)
+
+parser.add_argument(
+    "-C",
+    "--count",
+    type=int,
+    default=1,
+    help="Количество запросов"
+)
+
+args = parser.parse_args()
+
+print(args.hosts)
+print(args.count)
