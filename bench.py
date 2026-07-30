@@ -1,5 +1,6 @@
 import argparse
 import requests
+import time
 
 parser = argparse.ArgumentParser()
 
@@ -24,7 +25,9 @@ for host in hosts:
     print(f"\nПроверяем {host}")
 
     for i in range(args.count):
-        print(f"Запрос №{i + 1}")
-
+        start = time.perf_counter()
         response = requests.get(host)
-        print(response.status_code)
+        finish = time.perf_counter()
+        elapsed = finish - start
+
+        print(f"Запрос {i + 1}: {response.status_code} ({elapsed:.3f} сек)")
