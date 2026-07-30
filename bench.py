@@ -64,9 +64,9 @@ def check_host(host, count):
 
         except requests.RequestException as e:
             errors += 1
-            output(f"Запрос {i + 1}: {e}")
+            output(f"Запрос {i + 1}: Ошибка ({e})")
 
-    output(f"\nСтатистика для {host}")
+    output(f"\nСтатистика для {host}:")
     output(f"Success: {success}")
     output(f"Failed: {failed}")
     output(f"Errors: {errors}")
@@ -77,6 +77,13 @@ def check_host(host, count):
         output(f"Avg: {sum(times) / len(times):.3f} сек")
 
 args = parser.parse_args()
+
+if args.output:
+    try:
+        output_file = open(args.output, "w", encoding="utf-8")
+    except OSError:
+        parser.error(f"Не удалось открыть файл '{args.output}'")
+
 if args.count <= 0:
     parser.error("Количество запросов должно быть больше нуля")
 
@@ -97,3 +104,6 @@ else:
 for host in hosts:
     if not re.fullmatch(r"https://[A-Za-z0-9.-]+\.[A-Za-z]{2,}", host):
         parser.error(f"Некорректный адрес: {host}")
+
+for host in hosts:
+    check_host(host, args.count)
